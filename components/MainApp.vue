@@ -5,7 +5,7 @@ import RouteDetails from '@/components/RouteDetails.vue'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useRoutePlanner } from '@/composables/useRoutePlanner'
 
-const { coords, request } = useGeolocation()
+const { coords, locationName, request } = useGeolocation()
 const { plan } = useRoutePlanner()
 
 const routeGeoJson = ref<any>(null)
@@ -47,7 +47,7 @@ async function useCurrentLocation() {
   try {
     await request()
     if (coords.value) {
-      startInputValue.value = `${coords.value.lat}, ${coords.value.lng}`
+      startInputValue.value = locationName.value
       startMarker.value = coords.value
     }
   } catch (e) {
@@ -90,7 +90,7 @@ async function sendLocation() {
     <div v-if="error" class="px-4 py-2 text-sm text-red-600">{{ error }}</div>
     <RouteDetails
       v-if="routeStarted"
-      class="absolute bottom-0 justify-self-center w-[80%] sm:w-[60%] z-10"
+      class="absolute bottom-0 justify-self-center w-[80%] sm:w-[60%]"
       :distance-km="distanceKm"
       :duration-min="durationMin"
       :ascent-m="ascentM"
