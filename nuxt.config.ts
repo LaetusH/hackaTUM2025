@@ -40,6 +40,7 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    orsApiKey: process.env.ORS_API_KEY,
     public: {
       orsApiKey: process.env.ORS_API_KEY || ''
     }

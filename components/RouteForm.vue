@@ -36,7 +36,7 @@ const debouncedSearch = useDebounceFn((q: string) => search(q), 300)
       <ul v-if="suggestions.length" class="absolute z-50 bg-white border rounded-md mt-1 w-full">
         <li
           v-for="s in suggestions"
-          :key="s.label"
+          :key="s.label + '-' + s.coords.lat + '-' + s.coords.lng"
           @click="selectSuggestion(s)"
           class="px-3 py-2 hover:bg-slate-100 cursor-pointer"
         >
@@ -45,19 +45,18 @@ const debouncedSearch = useDebounceFn((q: string) => search(q), 300)
       </ul>
     </div>
 
-    <!-- Destination input -->
     <div class="relative">
       <input
         v-model="end"
         type="text"
         placeholder="Destination"
-        @input="activeField='end'; search(end)"
+        @input="activeField='end'; debouncedSearch(end)"
         class="w-full rounded-md border px-3 py-3"
       />
       <ul v-if="suggestions.length && activeField==='end'" class="absolute z-50 bg-white border rounded-md mt-1 w-full">
         <li
           v-for="s in suggestions"
-          :key="s.label"
+          :key="s.label + '-' + s.coords.lat + '-' + s.coords.lng"
           @click="selectSuggestion(s)"
           class="px-3 py-2 hover:bg-slate-100 cursor-pointer"
         >
@@ -66,7 +65,7 @@ const debouncedSearch = useDebounceFn((q: string) => search(q), 300)
       </ul>
     </div>
 
-    <button type="submit" class="mt-2 w-full rounded-md bg-primary text-white px-4 py-3">
+    <button type="submit" class="mt-2 w-full rounded-md bg-primary px-4 py-3">
       Plan route
     </button>
   </form>

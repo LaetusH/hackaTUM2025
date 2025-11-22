@@ -14,13 +14,26 @@ type PlanResult = {
 async function geocode(text: string, apiKey: string): Promise<Coordinates | null> {
   const url = 'https://api.openrouteservice.org/geocode/search'
   const res = await fetch(`${url}?api_key=${apiKey}&text=${encodeURIComponent(text)}&size=1`)
-  if (!res.ok) return null
+
+  if (!res.ok) {
+    console.error('Geocode failed:', res.status, res.statusText)
+    const errText = await res.text()
+    console.error('Error body:', errText)
+    return null
+  }
+
   const data = await res.json()
+
   const feat = data.features?.[0]
-  if (!feat) return null
+  if (!feat) {
+    console.warn('No features returned for', text)
+    return null
+  }
+
   const [lng, lat] = feat.geometry.coordinates
   return { lat, lng }
 }
+
 
 export function useRoutePlanner() {
   const config = useRuntimeConfig()
@@ -37,17 +50,15 @@ export function useRoutePlanner() {
       const body = {
         coordinates: [[start.lng, start.lat], [end.lng, end.lat]],
         elevation: true,
-        instructions: false,
-        profile: 'cycling-regular', // other profiles: cycling-road, cycling-mountain
+        instructions: false
       }
 
-      const res = await fetch('https://api.openrouteservice.org/v2/directions/cycling-regular/geojson', {
+      const res = await $fetch('/api/route', {
         method: 'POST',
-        body: JSON.stringify(body),
-      })
-      if (!res.ok) return { error: 'Route request failed.' }
+        body,
+      }) as any
 
-      const data = await res.json()
+      const data = await res
       const feat = data.features?.[0]
       const sum = feat?.properties?.summary
 
