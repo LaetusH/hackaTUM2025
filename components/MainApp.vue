@@ -18,6 +18,9 @@ const descentM = ref<number | undefined>()
 const loading = ref(false)
 const error = ref<string | null>(null)
 
+const routeStarted = ref(false)
+const startInputValue = ref('')
+
 async function onSubmit({ start, end }: { start: string; end: string }) {
   error.value = null
   loading.value = true
@@ -27,6 +30,7 @@ async function onSubmit({ start, end }: { start: string; end: string }) {
       error.value = res.error
       return
     }
+    routeStarted.value = true
     routeGeoJson.value = res.geojson
     startMarker.value = res.start
     endMarker.value = res.end
@@ -42,10 +46,15 @@ async function onSubmit({ start, end }: { start: string; end: string }) {
 async function useCurrentLocation() {
   try {
     await request()
+    if (coords.value) {
+      startInputValue.value = `${coords.value.lat}, ${coords.value.lng}`
+      startMarker.value = coords.value
+    }
   } catch (e) {
     error.value = 'Unable to retrieve current location.'
   }
 }
+
 
 async function sendLocation() {
   if (!coords.value) return
@@ -62,26 +71,32 @@ async function sendLocation() {
 </script>
 
 <template>
-  <section class="grid gap-2">
-    <RouteForm @submit="onSubmit" @use-current-location="useCurrentLocation" />
-
-    <div v-if="loading" class="px-4 py-2 text-sm text-slate-500">Planning route…</div>
-    <div v-if="error" class="px-4 py-2 text-sm text-red-600">{{ error }}</div>
-
+  <div class="relative w-full h-screen">
     <MapView
+      class="absolute inset-0 z-0"
       :center="coords"
       :route-geo-json="routeGeoJson"
       :start-marker="startMarker"
       :end-marker="endMarker"
     />
-
+    <RouteForm 
+      v-if="!routeStarted" 
+      class="absolute top-0 left-0 w-full z-10 bg-gray-200"
+      @submit="onSubmit" 
+      @use-current-location="useCurrentLocation" 
+      :start-value="startInputValue"
+    />
+    <div v-if="loading" class="px-4 py-2 text-sm text-slate-500">Planning route…</div>
+    <div v-if="error" class="px-4 py-2 text-sm text-red-600">{{ error }}</div>
     <RouteDetails
+      v-if="routeStarted"
+      class="absolute bottom-0 justify-self-center w-[80%] sm:w-[60%] z-10"
       :distance-km="distanceKm"
       :duration-min="durationMin"
       :ascent-m="ascentM"
       :descent-m="descentM"
     />
-  </section>
+  </div>
   <div>
     <button @click="request">📍 Standort abfragen</button>
     <button @click="sendLocation" :disabled="!coords">➡️ An Backend senden</button>

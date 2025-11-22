@@ -16,12 +16,14 @@ let map: L.Map | null = null
 let routeLayer: L.GeoJSON<any> | null = null
 let startMarker: L.Marker | null = null
 let endMarker: L.Marker | null = null
+let attributionControl: L.Control.Attribution | null = null
 
 onMounted(() => {
   if (!mapEl.value) return
 
   map = L.map(mapEl.value, {
     zoomControl: false,
+    attributionControl: false
   }).setView([props.center.lat, props.center.lng], 13)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -29,7 +31,7 @@ onMounted(() => {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map)
 
-  L.control.zoom({ position: 'bottomright' }).addTo(map)
+  attributionControl = L.control.attribution({ position: 'bottomright'}).addTo(map)
 })
 
 watch(() => props.routeGeoJson, (geo) => {
@@ -42,6 +44,11 @@ watch(() => props.routeGeoJson, (geo) => {
 
   const bounds = routeLayer.getBounds()
   map.fitBounds(bounds, { padding: [24, 24] })
+
+  if (attributionControl) {
+    map.removeControl(attributionControl)
+    attributionControl = L.control.attribution({ position: 'topright' }).addTo(map)
+  }
 })
 
 watch(() => props.startMarker, (pos) => {
@@ -58,7 +65,7 @@ watch(() => props.endMarker, (pos) => {
 </script>
 
 <template>
-  <div ref="mapEl" class="h-[50vh] sm:h-[60vh] w-full rounded-t-2xl overflow-hidden touch-pan-y"></div>
+  <div ref="mapEl" class="h-full w-full rounded-t-2xl overflow-hidden touch-pan-y"></div>
 </template>
 
 <style>

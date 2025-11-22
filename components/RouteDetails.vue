@@ -4,25 +4,35 @@ type Props = {
   durationMin?: number
   ascentM?: number
   descentM?: number
+  nextTrafficLight?: number
+  velocityKmh?: number
 }
 const props = defineProps<Props>()
 </script>
 
 <template>
-  <div class="px-4 py-3 grid gap-2">
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500">Distance</span>
-      <span class="text-base font-medium">{{ props.distanceKm?.toFixed(2) ?? '-' }} km</span>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500">Estimated time</span>
-      <span class="text-base font-medium">{{ props.durationMin?.toFixed(0) ?? '-' }} min</span>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500">Elevation</span>
-      <span class="text-base font-medium">
-        ↑ {{ props.ascentM ?? '-' }} m · ↓ {{ props.descentM ?? '-' }} m
+  <div class="px-6 py-4 m-5 flex items-center justify-between bg-white shadow-md rounded-full">
+    <div class="text-left">
+      <span class="block text-lg font-semibold text-slate-700">
+        {{ props.nextTrafficLight ?? '-' }} m
       </span>
+      <span class="text-sm text-slate-500">Next light</span>
+    </div>
+
+    <div class="text-center">
+      <span class="block text-2xl font-bold text-slate-800">
+        {{ props.velocityKmh?.toFixed(1) ?? '-' }} km/h
+      </span>
+      <span class="text-sm text-slate-500">Velocity</span>
+    </div>
+
+    <div class="text-right">
+      <div class="text-base font-medium">
+        {{ props.distanceKm?.toFixed(2) ?? '-' }} km
+      </div>
+      <div class="text-base font-medium">
+        {{ props.durationMin?.toFixed(0) ?? '-' }} min
+      </div>
     </div>
   </div>
 </template>
