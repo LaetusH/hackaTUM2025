@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MainApp from './components/MainApp.vue';
+import 'leaflet/dist/leaflet.css';
 
 useHead({
   meta: [

@@ -2,6 +2,12 @@
 import { onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
 
+L.Icon.Default.mergeOptions({
+  iconUrl: '/marker-icon.png',
+  iconRetinaUrl: '/marker-icon-2x.png',
+  shadowUrl: '/marker-shadow.png',
+})
+
 type LatLng = { lat: number; lng: number }
 type Props = {
   center: LatLng
