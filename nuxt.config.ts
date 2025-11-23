@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Tempute',
-      short_name: 'Tempute',
+      name: 'Green Wave',
+      short_name: 'GreenWave',
       theme_color: '#ffffff',
       background_color: '#ffffff',
       display: 'standalone',

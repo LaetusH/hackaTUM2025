@@ -84,6 +84,10 @@ onMounted(() => {
   overlayGroup = L.layerGroup().addTo(map)
 })
 
+function reloadPage() {
+  window.location.reload()
+}
+
 watch(() => props.waterDispensers, (dispensers) => {
   if (!overlayGroup || !dispensers) return
   overlayGroup.clearLayers()
@@ -153,10 +157,18 @@ watch(() => props.routeStarted, (started) => {
     <button
       v-if="props.routeStarted"
       @click="toggleOverlays"
-      class="absolute top-4 left-4 z-20 bg-white px-3 py-2 rounded shadow-md"
+      class="absolute top-6 left-6 z-20 bg-white px-3 py-2 rounded shadow-md"
     >
       {{ showOverlays ? 'Hide Extras' : 'Show Extras' }}
     </button>
+    <button
+      v-if="props.routeStarted"
+      @click="reloadPage"
+      class="absolute top-6 right-6 z-20 bg-white rounded-full shadow p-1"
+    >
+      <img src="/cancel.png" alt="Cancel" class="w-12 h-12" />
+    </button>
+
   </div>
 </template>
 
