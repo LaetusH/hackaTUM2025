@@ -157,14 +157,14 @@ watch(() => props.routeStarted, (started) => {
     <button
       v-if="props.routeStarted"
       @click="toggleOverlays"
-      class="absolute top-6 left-6 z-20 bg-white px-3 py-2 rounded shadow-md"
+      class="absolute top-6 left-6 z-20 bg-white px-3 py-2 cursor-pointer rounded shadow-md"
     >
       {{ showOverlays ? 'Hide Extras' : 'Show Extras' }}
     </button>
     <button
       v-if="props.routeStarted"
       @click="reloadPage"
-      class="absolute top-6 right-6 z-20 bg-white rounded-full shadow p-1"
+      class="absolute top-6 right-6 z-20 bg-white cursor-pointer rounded-full shadow p-1"
     >
       <img src="/cancel.png" alt="Cancel" class="w-12 h-12" />
     </button>
