@@ -23,8 +23,20 @@ export function useGeolocation() {
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
       )
       const data = await res.json()
-      locationName.value = data.display_name || `${lat}, ${lng}`
-      console.log(locationName.value)
+      const addr = data.address
+      if (addr) {
+        // Example: "Street 123, City"
+        locationName.value = [
+          addr.road,
+          addr.house_number,
+          addr.city || addr.town || addr.village,
+          addr.country
+        ]
+          .filter(Boolean)
+          .join(', ')
+        } else {
+          locationName.value = `${lat}, ${lng}`
+        }
     } catch {
       locationName.value = `${lat}, ${lng}`
     }

@@ -88,14 +88,16 @@ async function sendLocation() {
     />
     <div v-if="loading" class="px-4 py-2 text-sm text-slate-500">Planning route…</div>
     <div v-if="error" class="px-4 py-2 text-sm text-red-600">{{ error }}</div>
-    <RouteDetails
-      v-if="routeStarted"
-      class="absolute bottom-0 justify-self-center w-[80%] sm:w-[60%]"
-      :distance-km="distanceKm"
-      :duration-min="durationMin"
-      :ascent-m="ascentM"
-      :descent-m="descentM"
-    />
+    <div class="absolute bottom-0 w-full flex justify-center z-10">
+      <RouteDetails
+        v-if="routeStarted"
+        class="w-[80%] sm:w-[60%]"
+        :distance-km="distanceKm"
+        :duration-min="durationMin"
+        :ascent-m="ascentM"
+        :descent-m="descentM"
+      />
+    </div>
   </div>
   <div>
     <button @click="request">📍 Standort abfragen</button>
