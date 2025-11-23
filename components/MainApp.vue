@@ -111,7 +111,7 @@ onMounted(async () => {
     <div class="absolute bottom-0 w-full flex justify-center z-10">
       <RouteDetails
         v-if="routeStarted"
-        class="w-[80%] sm:w-[60%]"
+        class="w-[90%] sm:w-[60%]"
         :distance-km="distanceKm"
         :duration-min="durationMin"
         :ascent-m="ascentM"
