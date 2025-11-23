@@ -21,8 +21,11 @@ type Props = {
   waterDispensers?: Dispenser[]
   serviceStations?: ServiceStation[]
   bikeParking?: Parking[]
+  routeStarted?: boolean
 }
 const props = defineProps<Props>()
+
+let overlayGroup: L.LayerGroup | null = null
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | null = null
@@ -52,6 +55,18 @@ let startMarker: L.Marker | null = null
 let endMarker: L.Marker | null = null
 let attributionControl: L.Control.Attribution | null = null
 
+const showOverlays = ref(true)
+
+function toggleOverlays() {
+  if (!map || !overlayGroup) return
+  showOverlays.value = !showOverlays.value
+  if (showOverlays.value) {
+    overlayGroup.addTo(map)
+  } else {
+    map.removeLayer(overlayGroup)
+  }
+}
+
 onMounted(() => {
   if (!mapEl.value) return
 
@@ -66,35 +81,34 @@ onMounted(() => {
   }).addTo(map)
 
   attributionControl = L.control.attribution({ position: 'bottomright'}).addTo(map)
+  overlayGroup = L.layerGroup().addTo(map)
 })
 
 watch(() => props.waterDispensers, (dispensers) => {
-  if (!map || !dispensers) return
-  if (dispenserLayer) dispenserLayer.remove()
-
-  dispenserLayer = L.layerGroup(
-    dispensers.map(d =>
-      L.marker([d.lat, d.lng], { icon: waterIcon, title: d.name })
-        .bindPopup(`<strong>${d.name}</strong>`)
-    )
-  ).addTo(map)
+  if (!overlayGroup || !dispensers) return
+  overlayGroup.clearLayers()
+  dispensers.forEach(d =>
+    L.marker([d.lat, d.lng], { icon: waterIcon, title: d.name })
+      .bindPopup(`<strong>${d.name}</strong>`)
+      .addTo(overlayGroup!)
+  )
 })
 
 watch(() => props.serviceStations, (stations) => {
-  if (!map || !stations) return
+  if (!overlayGroup || !stations) return
   stations.forEach(s =>
     L.marker([s.lat, s.lng], { icon: serviceIcon })
       .bindPopup(`<b>${s.name}</b><br/>Pump: ${s.pump ? '✅' : '❌'}<br/>Tools: ${s.tools ? '✅' : '❌'}`)
-      .addTo(map!)
+      .addTo(overlayGroup!)
   )
 })
 
 watch(() => props.bikeParking, (parkings) => {
-  if (!map || !parkings) return
+  if (!overlayGroup || !parkings) return
   parkings.forEach(p =>
     L.polygon(p.coords, { color: 'green', fillColor: 'lightgreen', fillOpacity: 0.4, weight: 4 })
       .bindPopup(`<b>${p.name}</b>`)
-      .addTo(map!)
+      .addTo(overlayGroup!)
   )
 })
 
@@ -126,10 +140,24 @@ watch(() => props.endMarker, (pos) => {
   if (endMarker) endMarker.remove()
   endMarker = L.marker([pos.lat, pos.lng], { title: 'Destination' }).addTo(map)
 })
+
+watch(() => props.routeStarted, (started) => {
+  console.log('routeStarted prop:', started)
+})
+
 </script>
 
 <template>
-  <div ref="mapEl" class="h-full w-full rounded-t-2xl overflow-hidden touch-pan-y"></div>
+  <div class="relative h-full w-full">
+    <div ref="mapEl" class="h-full w-full overflow-hidden touch-pan-y z-10"></div>
+    <button
+      v-if="props.routeStarted"
+      @click="toggleOverlays"
+      class="absolute top-4 left-4 z-20 bg-white px-3 py-2 rounded shadow-md"
+    >
+      {{ showOverlays ? 'Hide Extras' : 'Show Extras' }}
+    </button>
+  </div>
 </template>
 
 <style>

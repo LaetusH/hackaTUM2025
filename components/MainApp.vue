@@ -66,7 +66,6 @@ async function useCurrentLocation() {
   }
 }
 
-
 async function sendLocation() {
   if (!coords.value) return
   const res = await $fetch('/location', {
@@ -98,6 +97,7 @@ onMounted(async () => {
       :water-dispensers="waterDispensers"
       :service-stations="serviceStations"
       :bike-parking="bikeParking"
+      :route-started="routeStarted"
     />
     <RouteForm 
       v-if="!routeStarted" 
