@@ -4,6 +4,17 @@ import MapView from '@/components/MapView.vue'
 import RouteDetails from '@/components/RouteDetails.vue'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useRoutePlanner } from '@/composables/useRoutePlanner'
+import { useWaterDispensers } from '~/composables/useWaterDispensers'
+import { useServiceStations } from '@/composables/useServiceStations'
+import { useBikeParking } from '@/composables/useBikeParking'
+import type { Dispenser } from '~/composables/useWaterDispensers'
+import type { ServiceStation } from '@/composables/useServiceStations'
+import type { Parking } from '@/composables/useBikeParking'
+
+const waterDispensers = ref<Dispenser[]>([])
+const serviceStations = ref<ServiceStation[]>([])
+const bikeParking = ref<Parking[]>([])
+
 
 const { coords, locationName, request } = useGeolocation()
 const { plan } = useRoutePlanner()
@@ -68,6 +79,12 @@ async function sendLocation() {
   })
   console.log(res)
 }
+
+onMounted(async () => {
+  waterDispensers.value = await useWaterDispensers()
+  serviceStations.value = await useServiceStations()
+  bikeParking.value = await useBikeParking()
+})
 </script>
 
 <template>
@@ -78,6 +95,9 @@ async function sendLocation() {
       :route-geo-json="routeGeoJson"
       :start-marker="startMarker"
       :end-marker="endMarker"
+      :water-dispensers="waterDispensers"
+      :service-stations="serviceStations"
+      :bike-parking="bikeParking"
     />
     <RouteForm 
       v-if="!routeStarted" 

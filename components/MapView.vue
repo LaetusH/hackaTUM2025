@@ -9,16 +9,44 @@ L.Icon.Default.mergeOptions({
 })
 
 type LatLng = { lat: number; lng: number }
+type Dispenser = { lat: number; lng: number; name: string }
+type ServiceStation = { lat: number; lng: number; name: string; pump: boolean; tools: boolean }
+type Parking = { coords: [number, number][], name: string }
+
 type Props = {
   center: LatLng
   routeGeoJson?: any
   startMarker?: LatLng
   endMarker?: LatLng
+  waterDispensers?: Dispenser[]
+  serviceStations?: ServiceStation[]
+  bikeParking?: Parking[]
 }
 const props = defineProps<Props>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | null = null
+let dispenserLayer: L.LayerGroup | null = null
+
+const waterIcon = L.icon({
+  iconUrl: 'water-drop.png',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28]
+})
+const serviceIcon = L.icon({
+  iconUrl: 'tool.png',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28]
+})
+const parkingIcon = L.icon({
+  iconUrl: 'parking.png',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28]
+})
+
 let routeLayer: L.GeoJSON<any> | null = null
 let startMarker: L.Marker | null = null
 let endMarker: L.Marker | null = null
@@ -38,6 +66,36 @@ onMounted(() => {
   }).addTo(map)
 
   attributionControl = L.control.attribution({ position: 'bottomright'}).addTo(map)
+})
+
+watch(() => props.waterDispensers, (dispensers) => {
+  if (!map || !dispensers) return
+  if (dispenserLayer) dispenserLayer.remove()
+
+  dispenserLayer = L.layerGroup(
+    dispensers.map(d =>
+      L.marker([d.lat, d.lng], { icon: waterIcon, title: d.name })
+        .bindPopup(`<strong>${d.name}</strong>`)
+    )
+  ).addTo(map)
+})
+
+watch(() => props.serviceStations, (stations) => {
+  if (!map || !stations) return
+  stations.forEach(s =>
+    L.marker([s.lat, s.lng], { icon: serviceIcon })
+      .bindPopup(`<b>${s.name}</b><br/>Pump: ${s.pump ? '✅' : '❌'}<br/>Tools: ${s.tools ? '✅' : '❌'}`)
+      .addTo(map!)
+  )
+})
+
+watch(() => props.bikeParking, (parkings) => {
+  if (!map || !parkings) return
+  parkings.forEach(p =>
+    L.polygon(p.coords, { color: 'green', fillColor: 'lightgreen', fillOpacity: 0.4, weight: 4 })
+      .bindPopup(`<b>${p.name}</b>`)
+      .addTo(map!)
+  )
 })
 
 watch(() => props.routeGeoJson, (geo) => {
